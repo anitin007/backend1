@@ -7,13 +7,19 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "keywords": ["inventory", "REST API", "express", "nodejs"],
+  "keywords": [
+    "inventory",
+    "REST API",
+    "express",
+    "nodejs"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

@@ -1,0 +1,26 @@
+# netlify.toml
+# ─────────────────────────────────────────────────────────────
+# Netlify build & deployment configuration for the
+# Simple Inventory Management System
+# ─────────────────────────────────────────────────────────────
+
+[build]
+  # The folder Netlify will serve as the website (our frontend)
+  publish = "public"
+
+  # Netlify auto-discovers functions in this folder
+  functions = "netlify/functions"
+
+# ── Redirect all /api/* calls to the serverless function ─────
+# This is the KEY part — it rewrites /api/inventory to
+# /.netlify/functions/api/inventory transparently
+[[redirects]]
+  from   = "/api/*"
+  to     = "/.netlify/functions/api/:splat"
+  status = 200
+
+# ── Serve index.html for any unknown path (SPA fallback) ─────
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
