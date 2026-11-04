@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory Store — Simple Inventory Management</title>
+  <meta name="description" content="A modern shopping-style interface for the Simple Inventory Management System." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       NOTIFICATION TOAST
+  ════════════════════════════════════════════════ -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       HEADER / NAVBAR
+  ════════════════════════════════════════════════ -->
+  <header class="header" id="siteHeader">
+    <div class="header-inner">
+
+      <!-- Logo -->
+      <a href="/" class="logo" id="siteLogo">
+        <span class="logo-icon">🛍️</span>
+        <span class="logo-text">Inventory<strong>Store</strong></span>
+      </a>
+
+      <!-- Search bar -->
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search products..."
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- Right controls -->
+      <div class="header-actions">
+        <div class="product-count-badge" id="productCountBadge">
+          <span id="productCountNum">0</span>
+          <span>Products</span>
+        </div>
+        <button class="btn btn-primary" id="addItemBtn">
+          ＋ Add New Item
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════
+       FILTER / SORT BAR
+  ════════════════════════════════════════════════ -->
+  <section class="filter-bar" id="filterBar">
+    <div class="filter-inner">
+
+      <div class="filter-group">
+        <label for="categoryFilter" class="filter-label">Category</label>
+        <select id="categoryFilter" class="filter-select">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="minQtyFilter" class="filter-label">Min Qty</label>
+        <input type="number" id="minQtyFilter" class="filter-input" placeholder="e.g. 0" min="0" />
+      </div>
+
+      <div class="filter-group">
+        <label for="maxQtyFilter" class="filter-label">Max Qty</label>
+        <input type="number" id="maxQtyFilter" class="filter-input" placeholder="e.g. 100" min="0" />
+      </div>
+
+      <div class="filter-group">
+        <label for="sortSelect" class="filter-label">Sort by Price</label>
+        <select id="sortSelect" class="filter-select">
+          <option value="">Default</option>
+          <option value="asc">Low → High</option>
+          <option value="desc">High → Low</option>
+        </select>
+      </div>
+
+      <button class="btn btn-outline" id="clearFiltersBtn">✕ Clear</button>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN CONTENT — PRODUCT GRID
+  ════════════════════════════════════════════════ -->
+  <main class="main" id="mainContent">
+
+    <!-- Loading spinner -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <p class="loading-text">Loading products…</p>
+    </div>
+
+    <!-- Product grid -->
+    <div class="product-grid" id="productGrid"></div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-icon">📦</div>
+      <h2 class="empty-title">No products found</h2>
+      <p class="empty-sub">Try adjusting your search or filters, or add a new item.</p>
+      <button class="btn btn-primary" id="emptyAddBtn">＋ Add First Item</button>
+    </div>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL — ADD / EDIT ITEM
+  ════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" style="display:none;">
+    <div class="modal" id="modalBox">
+
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Add New Item</h2>
+        <button class="modal-close" id="modalCloseBtn" aria-label="Close modal">✕</button>
+      </div>
+
+      <form class="modal-form" id="itemForm" novalidate>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="fieldName" class="form-label">Product Name <span class="required">*</span></label>
+            <input type="text" id="fieldName" class="form-control" placeholder="e.g. Wireless Keyboard" required />
+            <span class="form-error" id="errName"></span>
+          </div>
+          <div class="form-group">
+            <label for="fieldCategory" class="form-label">Category <span class="required">*</span></label>
+            <input type="text" id="fieldCategory" class="form-control" placeholder="e.g. Electronics" required />
+            <span class="form-error" id="errCategory"></span>
+          </div>
+        </div>
+
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label for="fieldPrice" class="form-label">Price (₹) <span class="required">*</span></label>
+            <input type="number" id="fieldPrice" class="form-control" placeholder="e.g. 1299" min="0.01" step="0.01" required />
+            <span class="form-error" id="errPrice"></span>
+          </div>
+          <div class="form-group">
+            <label for="fieldQuantity" class="form-label">Quantity <span class="required">*</span></label>
+            <input type="number" id="fieldQuantity" class="form-control" placeholder="e.g. 25" min="0" step="1" required />
+            <span class="form-error" id="errQuantity"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fieldDesc" class="form-label">Description <span class="required">*</span></label>
+          <textarea id="fieldDesc" class="form-control" rows="3" placeholder="Short description of the product…" required></textarea>
+          <span class="form-error" id="errDesc"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="fieldImage" class="form-label">Image URL <span class="optional">(optional)</span></label>
+          <input type="url" id="fieldImage" class="form-control" placeholder="https://example.com/image.jpg" />
+        </div>
+
+        <!-- Image preview -->
+        <div class="image-preview-wrap" id="imagePreviewWrap" style="display:none;">
+          <img id="imagePreview" src="" alt="Preview" class="image-preview" />
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="modalCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="modalSaveBtn">💾 Save Item</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       DELETE CONFIRMATION DIALOG
+  ════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" style="display:none;">
+    <div class="modal confirm-modal" id="confirmBox">
+      <div class="confirm-icon">🗑️</div>
+      <h3 class="confirm-title" id="confirmTitle">Delete Product?</h3>
+      <p class="confirm-text" id="confirmText">This item will be permanently deleted. This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="confirmCancelBtn">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
